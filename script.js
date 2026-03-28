@@ -730,20 +730,69 @@ document.addEventListener('DOMContentLoaded', () => {
     renderData();
 });
 
-// Register Service Worker
+// Register Service Worker and handle updates
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
             .then((registration) => {
                 console.log('Service Worker registered with scope:', registration.scope);
+
+                // Check for updates periodically
+                setInterval(() => {
+                    registration.update();
+                }, 1000 * 60 * 60); // Check every hour
+
+                registration.onupdatefound = () => {
+                    const installingWorker = registration.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // New content is available, show a toast or just reload
+                                    console.log('New update available. Reloading...');
+                                    if (confirm('නව යාවත්කාලීනයක් (Update) ඇත. එය ලබා ගැනීමට පිටුව නැවත පූරණය (Reload) කරන්නද?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            }
+                        };
+                    }
+                };
             })
             .catch((error) => {
                 console.error('Service Worker registration failed:', error);
             });
     });
+
+    // Handle controller change (when SKIP_WAITING is called)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+            window.location.reload();
+            refreshing = true;
+        }
+    });
 }
 
-// Add Install Prompt Logic
+    // Update Button Logic
+    const updateAppBtn = document.getElementById('update-app-btn');
+    if (updateAppBtn) {
+        updateAppBtn.addEventListener('click', () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        registration.update().then(() => {
+                            alert('යාවත්කාලීන පරීක්ෂා කිරීම අවසන් (Update Check Complete). අලුත් යමක් ඇත්නම් එය ස්වයංක්‍රීයව පූරණය වනු ඇත.');
+                        });
+                    }
+                });
+            } else {
+                window.location.reload();
+            }
+        });
+    }
+
+    // Add Install Prompt Logic
 let deferredPrompt;
 const installBtnArea = document.getElementById('header-action-area');
 
