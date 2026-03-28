@@ -386,6 +386,29 @@
     </section>
   </div>
 
+  <!-- Firebase SDKs (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEJL3hVJ44AGFY2ePdIshRL5toIxunBbM",
+      authDomain: "farmer-details-9a5f9.firebaseapp.com",
+      projectId: "farmer-details-9a5f9",
+      storageBucket: "farmer-details-9a5f9.firebasestorage.app",
+      messagingSenderId: "375949231765",
+      appId: "1:375949231765:web:60013515fb897092213d9c"
+    };
+    
+    // Initialize Firebase (Compat)
+    firebase.initializeApp(firebaseConfig);
+    const dbReal = firebase.firestore();
+    
+    // Global variable setup for later Database integration
+    window.firestoreDB = dbReal;
+  </script>
+
   <script src="script.js"></script>
 </body>
 </html>
